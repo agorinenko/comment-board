@@ -1,3 +1,5 @@
+import json
+
 from aiohttp import web
 from aiohttp.web_exceptions import HTTPError
 
@@ -8,6 +10,10 @@ async def error_middleware(request, handler):
         return await handler(request)
     except HTTPError as ex:
         details = ex.body.decode() if ex.body is not None else str(ex)
+        try:
+            details = json.loads(details)
+        except json.decoder.JSONDecodeError:
+            pass
 
         data = {
             "details": details
