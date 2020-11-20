@@ -1,11 +1,11 @@
 from aiohttp import web
-from aiohttp.web_exceptions import HTTPNotFound
 from webargs.aiohttpparser import use_kwargs
 
-from schemas.comment import update_schema, create_schema
-from schemas.paging import paging_schema
-from views.base_api_view import BaseApiView
+from api.request_schemas.comment import update_schema, create_schema
 from webargs import fields
+
+from api.request_schemas.paging import paging_schema
+from api.views.base_api_view import BaseApiView
 
 
 class CommentsView(BaseApiView):
