@@ -2,4 +2,6 @@ aiohttp
 webargs
 marshmallow
 sqlalchemy
-sqlalchemy
+alembic
+envparse
+psycopg2
