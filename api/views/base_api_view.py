@@ -2,9 +2,10 @@ from abc import ABC
 from typing import Optional, List
 
 from aiohttp import web
-from aiohttp.web_exceptions import HTTPMethodNotAllowed
+from aiohttp.web_exceptions import HTTPMethodNotAllowed, HTTPInternalServerError
 from aiohttp.web_request import Request
 from aiohttp.web_routedef import RouteDef
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class BaseApiView(ABC):
@@ -22,6 +23,12 @@ class BaseApiView(ABC):
 
     async def destroy(self, request: Request, *args, **kwargs):
         raise HTTPMethodNotAllowed('destroy', allowed_methods=[])
+
+    @classmethod
+    def db_session(cls, request) -> AsyncSession:
+        if 'db_session' not in request.app:
+            raise HTTPInternalServerError(text="DB session not found")
+        return request.app['db_session']
 
     @classmethod
     def routes(cls, path: Optional[str]) -> List[RouteDef]:

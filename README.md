@@ -5,12 +5,13 @@ pip install -r requirements.dev.txt
 ```
 ## Start dev server
 ```shell script
-adev runserver
+python -m api
 ```
 ## Create migrations
 ```shell script
-python -m db revision --message="Init" --autogenerate
+python -m db revision --autogenerate
 ```
+## Deploy migrations
 ```shell script
 python -m db upgrade head
 ```
