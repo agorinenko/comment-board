@@ -15,3 +15,7 @@ python -m db revision --autogenerate
 ```shell script
 python -m db upgrade head
 ```
+## Start dev server
+```shell script
+python -m api runserver api --root api --verbose
+```

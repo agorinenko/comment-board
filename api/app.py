@@ -1,7 +1,4 @@
-from types import MappingProxyType
-from typing import Mapping
-
-from aiohttp import web, PAYLOAD_REGISTRY
+from aiohttp import web
 from envparse import env
 from sqlalchemy import text
 
@@ -15,6 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 async def __setup_pg(application: web.Application):
     log = logging.getLogger('aiohttp.server')
+    application['logger.server'] = log
+
     db_info = f"{env.str('POSTGRES_USER')}@{env.str('POSTGRES_HOST')}:{env.str('POSTGRES_PORT')}/{env.str('POSTGRES_DB')}"
 
     log.info(f"Connecting to database: {db_info}")
@@ -45,4 +44,4 @@ app.cleanup_ctx.append(__setup_pg)
 app.add_routes(urlpatterns)
 log_level = logging.DEBUG if IS_DEV else logging.ERROR
 logging.basicConfig(level=log_level)
-web.run_app(app, port=8000)
+# web.run_app(app, port=8000)

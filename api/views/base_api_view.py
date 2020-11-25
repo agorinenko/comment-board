@@ -1,5 +1,6 @@
+import logging
 from abc import ABC
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from aiohttp import web
 from aiohttp.web_exceptions import HTTPMethodNotAllowed, HTTPInternalServerError
@@ -25,10 +26,18 @@ class BaseApiView(ABC):
         raise HTTPMethodNotAllowed('destroy', allowed_methods=[])
 
     @classmethod
-    def db_session(cls, request) -> AsyncSession:
-        if 'db_session' not in request.app:
-            raise HTTPInternalServerError(text="DB session not found")
-        return request.app['db_session']
+    def db_session(cls, request: Request) -> AsyncSession:
+        return cls.get_app_data(request, 'db_session')
+
+    @classmethod
+    def logger(cls, request: Request) -> logging.Logger:
+        return cls.get_app_data(request, 'logger.server')
+
+    @classmethod
+    def get_app_data(cls, request: Request, key: str) -> Any:
+        if key not in request.app:
+            raise HTTPInternalServerError(text=f"App data \"{key}\" not found")
+        return request.app[key]
 
     @classmethod
     def routes(cls, path: Optional[str]) -> List[RouteDef]:
