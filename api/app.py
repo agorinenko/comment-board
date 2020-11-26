@@ -1,4 +1,5 @@
 from aiohttp import web
+from aiohttp_apispec import setup_aiohttp_apispec
 from envparse import env
 from sqlalchemy import text
 
@@ -42,6 +43,15 @@ IS_DEV = (ENV == "DEV")
 app = web.Application(middlewares=[error_middleware])
 app.cleanup_ctx.append(__setup_pg)
 app.add_routes(urlpatterns)
+
 log_level = logging.DEBUG if IS_DEV else logging.ERROR
 logging.basicConfig(level=log_level)
+
+setup_aiohttp_apispec(
+    app=app,
+    title="REST API",
+    version="v1",
+    url="/api/docs/swagger.json",
+    swagger_path="/swg",
+)
 # web.run_app(app, port=8000)

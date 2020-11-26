@@ -17,6 +17,7 @@ class CreateCommentSchema(BaseCommentSchema):
     Create comment schema
     """
     parent = fields.Int(validate=lambda i: i > 0)
+    board_id = fields.Str(data_key="boardId", required=True, validate=validate.Length(min=32, max=36))
 
 
 class UpdateCommentSchema(BaseCommentSchema):

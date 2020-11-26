@@ -40,13 +40,18 @@ class BaseApiView(ABC):
         return request.app[key]
 
     @classmethod
-    def routes(cls, path: Optional[str]) -> List[RouteDef]:
-        if path.endswith('/'):
-            path = path[:-1]
+    def routes(cls, prefix: Optional[str] = None, path: Optional[str] = None) -> List[RouteDef]:
+        prefix = prefix if prefix is not None else ""
+        path = path if path is not None else ""
+
+        path = cls.urljoin("/", prefix, path)
 
         inst = cls()
 
-        item_path = path + "/{id}"
+        item_path = cls.urljoin("/", path, "{id}")
+
+        path = f"/{cls.prepare_url(path)}"
+        item_path = f"/{cls.prepare_url(item_path)}"
 
         return [
             web.get(path, inst.list),
@@ -55,3 +60,19 @@ class BaseApiView(ABC):
             web.delete(item_path, inst.destroy),
             web.get(item_path, inst.retrieve)
         ]
+
+    @classmethod
+    def urljoin(cls, separator: str, *args) -> str:
+        urls = list(filter(lambda url: url is not None, args))
+        urls = list(map(cls.prepare_url, urls))
+        return separator.join(urls)
+
+    @classmethod
+    def prepare_url(cls, url: str) -> str:
+        if url.endswith('/'):
+            url = url[:-1]
+
+        if url.startswith('/'):
+            url = url[1:]
+
+        return url
