@@ -4,6 +4,8 @@ from envparse import env
 
 from alembic.config import CommandLine, Config
 
+from db.utils import generate_db_url
+
 
 def main():
     env.read_envfile()
@@ -16,8 +18,7 @@ def main():
     options = alembic.parser.parse_args()
 
     config = Config("./alembic.ini")
-    config.set_main_option('sqlalchemy.url',
-                           f"postgresql://{env.str('POSTGRES_USER')}:{env.str('POSTGRES_PASSWORD')}@{env.str('POSTGRES_HOST')}:{env.str('POSTGRES_PORT')}/{env.str('POSTGRES_DB')}")
+    config.set_main_option('sqlalchemy.url', generate_db_url())
     exit(alembic.run_cmd(config, options))
 
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aiohttp import web
 from aiohttp_apispec import setup_aiohttp_apispec
 from envparse import env
@@ -10,17 +12,24 @@ import logging
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.utils import generate_db_url
+
+env.read_envfile()
+
+ENV = env.str('ENV')
+IS_DEV = (ENV == "DEV")
+
+log_level = logging.DEBUG if IS_DEV else logging.ERROR
+logging.basicConfig(level=log_level)
+
 
 async def __setup_pg(application: web.Application):
-    log = logging.getLogger('aiohttp.server')
-    application['logger.server'] = log
+    db_info = generate_db_url(mask_password=True)
 
-    db_info = f"{env.str('POSTGRES_USER')}@{env.str('POSTGRES_HOST')}:{env.str('POSTGRES_PORT')}/{env.str('POSTGRES_DB')}"
-
-    log.info(f"Connecting to database: {db_info}")
+    application['logger.server'].info(f"Connecting to database: {db_info}")
 
     engine = create_async_engine(
-        f"postgresql+asyncpg://{env.str('POSTGRES_USER')}:{env.str('POSTGRES_PASSWORD')}@{env.str('POSTGRES_HOST')}:{env.str('POSTGRES_PORT')}/{env.str('POSTGRES_DB')}",
+        generate_db_url(),
         echo=True
     )
     async with engine.begin() as conn:
@@ -28,25 +37,23 @@ async def __setup_pg(application: web.Application):
 
     async with AsyncSession(engine) as session:
         application['db_session'] = session
-        log.info(f"Connected to database: {db_info}")
+        application['logger.server'].info(f"Connected to database: {db_info}")
         yield
-        log.info(f"Disconnecting from database: {db_info}")
+        application['logger.server'].info(f"Disconnecting from database: {db_info}")
 
-    log.info(f"Disconnected from database: {db_info}")
+    application['logger.server'].info(f"Disconnected from database: {db_info}")
 
 
-env.read_envfile()
+def create_app() -> web.Application:
+    application = web.Application(middlewares=[error_middleware])
+    application['logger.server'] = logging.getLogger('aiohttp.server')
+    application.cleanup_ctx.append(__setup_pg)
+    application.add_routes(urlpatterns)
 
-ENV = env.str('ENV')
-IS_DEV = (ENV == "DEV")
+    return application
 
-app = web.Application(middlewares=[error_middleware])
-app.cleanup_ctx.append(__setup_pg)
-app.add_routes(urlpatterns)
 
-log_level = logging.DEBUG if IS_DEV else logging.ERROR
-logging.basicConfig(level=log_level)
-
+app = create_app()
 setup_aiohttp_apispec(
     app=app,
     title="REST API",
@@ -54,4 +61,5 @@ setup_aiohttp_apispec(
     url="/api/docs/swagger.json",
     swagger_path="/swg",
 )
+
 # web.run_app(app, port=8000)
