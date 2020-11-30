@@ -8,15 +8,15 @@ class CommentsListSchema(PagingSchema):
     """
     Comments list schema
     """
+    parent_id = fields.Int(data_key="parentId", validate=lambda i: i > 0)
     board_id = fields.Str(data_key="boardId", validate=validate.Length(min=32, max=36))
-    parent = fields.Int(validate=lambda i: i > 0)
 
 
 class CreateCommentSchema(BaseCommentSchema):
     """
     Create comment schema
     """
-    parent = fields.Int(validate=lambda i: i > 0)
+    parent_id = fields.Int(data_key="parentId", validate=lambda i: i > 0)
     board_id = fields.Str(data_key="boardId", required=True, validate=validate.Length(min=32, max=36))
 
 

@@ -19,3 +19,11 @@ python -m db upgrade head
 ```shell script
 python -m api runserver api --root api --verbose
 ```
+## Run tests from console
+```shell script
+pytest -ra
+```
+## PyCharm :: Run/Debug configuration
+1. Add python configuration
+1. Module name: api
+1. Parameters: runserver api --root api --verbose
