@@ -15,22 +15,22 @@ def generate_db_url(prefix: Optional[str] = None,
                     db_name: Optional[str] = None,
                     mask_password: bool = False):
     prefix = __validate_url_parameter(prefix, "postgresql+asyncpg")
-    user = __validate_url_parameter(user, env.str('DB_USER'))
+    user = __validate_url_parameter(user, env.str('POSTGRES_USER'))
     if mask_password:
         password = "*****"
     else:
-        password = __validate_url_parameter(password, env.str('DB_PASSWORD'))
+        password = __validate_url_parameter(password, env.str('POSTGRES_PASSWORD'))
 
     db_host = __validate_url_parameter(db_host, env.str('DB_HOST'))
     db_port = __validate_url_parameter(db_port, env.str('DB_PORT'))
-    db_name = __validate_url_parameter(db_name, env.str('DB_NAME'))
+    db_name = __validate_url_parameter(db_name, env.str('POSTGRES_DB'))
 
     return f"{prefix}://{user}:{password}@{db_host}:{db_port}/{db_name}"
 
 
 def setup_db():
-    db_name = env.str('DB_NAME')
-    db_user = env.str('DB_USER')
+    db_name = env.str('POSTGRES_DB')
+    db_user = env.str('POSTGRES_USER')
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     engine = create_engine(
@@ -51,7 +51,7 @@ def setup_db():
 
 
 def teardown_db():
-    db_name = env.str('DB_NAME')
+    db_name = env.str('POSTGRES_DB')
 
     engine = create_engine(
         generate_db_url(prefix="postgresql", db_name="postgres"),

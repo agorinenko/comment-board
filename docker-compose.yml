@@ -9,8 +9,6 @@ services:
       - .env
     networks:
       - common
-    environment:
-      - POSTGRES_PASSWORD=postgres
 
   app:
     ports:

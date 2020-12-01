@@ -15,8 +15,8 @@ async def client(aiohttp_client):
 
 @pytest.fixture(scope='session', autouse=True)
 def database():
-    db_name = env.str('DB_NAME')
-    os.environ['DB_NAME'] = f"test_{db_name}"
+    db_name = env.str('POSTGRES_DB')
+    os.environ['POSTGRES_DB'] = f"test_{db_name}"
     setup_db()
     yield
     teardown_db()
