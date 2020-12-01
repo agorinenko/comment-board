@@ -20,8 +20,8 @@ services:
       - common
     env_file:
       - .env
-    environment:
-      - ENV=TEST
+#    environment:
+#      - ENV=TEST
 
 networks:
   common:
