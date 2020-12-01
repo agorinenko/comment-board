@@ -10,6 +10,20 @@ services:
     networks:
       - common
 
+  app:
+    ports:
+      - 8001:8000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - common
+    env_file:
+      - .env
+    environment:
+      - ENV=TEST
+      - DB_HOST=db
+
 networks:
   common:
      external: true

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from aiohttp import web
 from aiohttp_apispec import setup_aiohttp_apispec
 from envparse import env
@@ -13,14 +11,6 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.utils import generate_db_url
-
-env.read_envfile()
-
-ENV = env.str('ENV')
-IS_DEV = (ENV == "DEV")
-
-log_level = logging.DEBUG if IS_DEV else logging.ERROR
-logging.basicConfig(level=log_level)
 
 
 async def __setup_pg(application: web.Application):
@@ -45,21 +35,32 @@ async def __setup_pg(application: web.Application):
 
 
 def create_app() -> web.Application:
+    env.read_envfile()
+
+    current_env = env.str('ENV')
+    is_dev = (current_env == "DEV")
+    is_prod = (current_env == "PROD")
+
+    log_level = logging.DEBUG if is_dev else logging.ERROR
+    logging.basicConfig(level=log_level)
+
     application = web.Application(middlewares=[error_middleware])
     application['logger.server'] = logging.getLogger('aiohttp.server')
     application.cleanup_ctx.append(__setup_pg)
     application.add_routes(urlpatterns)
 
+    if not is_prod:
+        setup_aiohttp_apispec(
+            app=application,
+            title="REST API",
+            version="v1",
+            url="/api/docs/swagger.json",
+            swagger_path="/swg",
+        )
+
     return application
 
 
 app = create_app()
-setup_aiohttp_apispec(
-    app=app,
-    title="REST API",
-    version="v1",
-    url="/api/docs/swagger.json",
-    swagger_path="/swg",
-)
 
 # web.run_app(app, port=8000)
