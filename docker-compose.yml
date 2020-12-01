@@ -22,7 +22,6 @@ services:
       - .env
     environment:
       - ENV=TEST
-      - DB_HOST=comment-board_db_1
 
 networks:
   common:
