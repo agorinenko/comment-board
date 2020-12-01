@@ -27,3 +27,5 @@ pytest -ra
 1. Add python configuration
 1. Module name: api
 1. Parameters: runserver api --root api --verbose
+## Environment variables
+See ".env.example" file
