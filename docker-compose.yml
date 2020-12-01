@@ -22,9 +22,7 @@ services:
       - .env
     environment:
       - ENV=TEST
-      - DB_HOST=comment-board_db
-    external_links:
-      - comment-board_db_1:comment-board_db
+      - DB_HOST=db
 
 networks:
   common:
