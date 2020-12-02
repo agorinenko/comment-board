@@ -40,7 +40,7 @@ class CommentsView(BaseApiView):
         serializer = CommentSchema()
         return JsonResponse(serializer).get_response(comment)
 
-    @use_kwargs(CreateCommentSchema(), location="form")
+    @use_kwargs(CreateCommentSchema(), location="json_or_form")
     @docs(tags=[TAG], summary='Create comment')
     @request_schema(CreateCommentSchema())
     @response_schema(CommentSchema(), code=200)
@@ -101,7 +101,7 @@ class CommentsView(BaseApiView):
         return JsonResponse(serializer).get_response(comments, count=count)
 
     @use_kwargs(IdSchema(), location="match_info")
-    @use_kwargs(UpdateCommentSchema(), location="form")
+    @use_kwargs(UpdateCommentSchema(), location="json_or_form")
     @docs(tags=[TAG], summary='Update comment')
     @request_schema(UpdateCommentSchema())
     @response_schema(CommentSchema(), code=200)
