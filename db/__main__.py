@@ -18,7 +18,7 @@ def main():
     options = alembic.parser.parse_args()
 
     config = Config("./alembic.ini")
-    config.set_main_option('sqlalchemy.url', generate_db_url())
+    config.set_main_option('sqlalchemy.url', generate_db_url(prefix='postgresql'))
     exit(alembic.run_cmd(config, options))
 
 
